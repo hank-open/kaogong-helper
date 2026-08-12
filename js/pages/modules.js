@@ -28,7 +28,7 @@
         <div class="stat-grid" style="grid-template-columns:repeat(3,1fr)">
           <div class="stat" style="background:linear-gradient(135deg,#F58AAB,#D5578A)"><div class="v">${tToday.count}</div><div class="k">今日题量</div></div>
           <div class="stat" style="background:linear-gradient(135deg,#A98BD4,#7B5FC0)"><div class="v">${tWeek.count}</div><div class="k">本周题量</div></div>
-          <div class="stat" style="background:linear-gradient(135deg,#5FBBA3,#2F9C82)"><div class="v">${tAll.count ? tAll.acc : 0}<small>%</small></div><div class="k">累计正确率</div></div>
+          <div class="stat" style="background:linear-gradient(135deg,#5FBBA3,#2F9C82)"><div class="v">${tAll.count ? tAll.acc + '<small>%</small>' : '<small style="font-size:15px">—</small>'}</div><div class="k">累计正确率</div></div>
         </div>
       </div>
 
@@ -54,7 +54,7 @@
       const tdy = store.statOf(store.practiceOn(today, m.id));
       const card = u.el(`<div class="mod-card" style="background:linear-gradient(140deg,${m.color},${shade(m.color, -22)})">
         <div class="nm">${u.esc(m.name)}<span class="cat">${u.esc(m.cat)}</span></div>
-        <div class="st"><span>今日 <b>${tdy.count}</b> 题</span><span>累计 ${st.count} 题 · ${st.count ? st.acc : 0}%</span></div>
+        <div class="st"><span>今日 <b>${tdy.count}</b> 题</span><span>累计 ${st.count} 题${st.count ? ' · ' + st.acc + '%' : ''}</span></div>
       </div>`);
       card.onclick = () => (location.hash = '#/module/' + m.id);
       grid.appendChild(card);
@@ -119,7 +119,7 @@
         <div class="grid">
           <div class="g"><div class="v">${stToday.count}</div><div class="k">今日题量</div></div>
           <div class="g"><div class="v">${stWeek.count}</div><div class="k">本周题量</div></div>
-          <div class="g"><div class="v">${stAll.count ? stAll.acc : 0}%</div><div class="k">累计正确率</div></div>
+          <div class="g"><div class="v">${stAll.count ? stAll.acc + '%' : '—'}</div><div class="k">累计正确率</div></div>
         </div>
       </div>
 

@@ -11,11 +11,12 @@
   let range = 'week'; // week | month | year
 
   function hourColor(h) {
-    if (h >= 8) return ['#B33E6E', '#8E2A55'];
-    if (h >= 6) return ['#D5578A', '#B33E6E'];
-    if (h >= 4) return ['#E7799A', '#CF5D82'];
-    if (h >= 2) return ['#F49BB6', '#E7799A'];
-    return ['#F8C3D3', '#F2A9C0'];
+    // 使用 CSS 变量中的主色衍生，热力图从浅到深
+    if (h >= 8) return ['#1A6ECC', '#0F4FA0'];
+    if (h >= 6) return ['#2563C8', '#1A5AB8'];
+    if (h >= 4) return ['#4A8FE8', '#2563C8'];
+    if (h >= 2) return ['#7AB8F5', '#4A8FE8'];
+    return ['#BDD9FA', '#A0C8F8'];
   }
 
   function render(view) {
@@ -44,7 +45,7 @@
         <div class="cal-week">${['一', '二', '三', '四', '五', '六', '日'].map((d) => `<span>${d}</span>`).join('')}</div>
         <div class="cal-grid" data-grid></div>
         <div class="cal-legend"><span>少</span>
-          <i style="background:#F8C3D3"></i><i style="background:#F49BB6"></i><i style="background:#E7799A"></i><i style="background:#D5578A"></i><i style="background:#B33E6E"></i>
+          <i style="background:#BDD9FA"></i><i style="background:#7AB8F5"></i><i style="background:#4A8FE8"></i><i style="background:#2563C8"></i><i style="background:#0F4FA0"></i>
           <span>多</span></div>
         <div class="sum-grid">
           <div class="sum"><div class="v">${cks.length}</div><div class="k">打卡天数</div></div>

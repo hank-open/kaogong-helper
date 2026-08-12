@@ -102,30 +102,37 @@
     const sessEl = card.querySelector('[data-sessions]');
     const CIRC = 289;
 
+    // 把 DOM 引用存入 tmr，让 tick 总是操作当前挂载的节点
+    t.timeEl = timeEl;
+    t.arcEl = arcEl;
+    t.actionBtn = actionBtn;
+    t.modeLabel = modeLabel;
+    t.sessEl = sessEl;
+
     function tick() {
       t.rem--;
-      timeEl.textContent = hms(t.rem);
-      arcEl.setAttribute('stroke-dashoffset', CIRC - (CIRC * t.rem / t.total));
+      // 只更新当前挂载的节点（t.timeEl 始终指向最新 card）
+      t.timeEl.textContent = hms(t.rem);
+      t.arcEl.setAttribute('stroke-dashoffset', CIRC - (CIRC * t.rem / t.total));
       if (t.rem <= 0) {
         clearInterval(t.interval);
         t.interval = null;
-        actionBtn.innerHTML = ui.icon('play', 14) + '开始';
+        t.actionBtn.innerHTML = ui.icon('play', 14) + '开始';
         if (t.mode === 'work') {
-          const today = store.state.settings.tomatoDate;
-          if (today !== u.today()) { store.state.settings.tomatoToday = 0; store.state.settings.tomatoDate = u.today(); }
+          if (store.state.settings.tomatoDate !== u.today()) { store.state.settings.tomatoToday = 0; store.state.settings.tomatoDate = u.today(); }
           store.state.settings.tomatoToday = (store.state.settings.tomatoToday || 0) + 1;
           store.save();
-          sessEl.innerHTML = '今日已完成 <b style="color:var(--rose-deep)">' + store.state.settings.tomatoToday + '</b> 个番茄';
+          t.sessEl.innerHTML = '今日已完成 <b style="color:var(--rose-deep)">' + store.state.settings.tomatoToday + '</b> 个番茄';
           t.mode = 'break'; t.rem = TOMATO_BREAK; t.total = TOMATO_BREAK;
-          modeLabel.textContent = '休息 5 分钟';
-          ui.toast('专注结束！休息 5 分钟 🎉');
+          t.modeLabel.textContent = '休息 5 分钟';
+          ui.toast('专注结束，休息 5 分钟');
         } else {
           t.mode = 'work'; t.rem = TOMATO_WORK; t.total = TOMATO_WORK;
-          modeLabel.textContent = '专注 25 分钟';
-          ui.toast('休息结束，准备下一个番茄 💪');
+          t.modeLabel.textContent = '专注 25 分钟';
+          ui.toast('休息结束，准备下一个番茄');
         }
-        timeEl.textContent = hms(t.rem);
-        arcEl.setAttribute('stroke-dashoffset', CIRC - (CIRC * t.rem / t.total));
+        t.timeEl.textContent = hms(t.rem);
+        t.arcEl.setAttribute('stroke-dashoffset', CIRC - (CIRC * t.rem / t.total));
       }
     }
 
@@ -133,19 +140,19 @@
       if (t.interval) {
         clearInterval(t.interval);
         t.interval = null;
-        actionBtn.innerHTML = ui.icon('play', 14) + '开始';
+        t.actionBtn.innerHTML = ui.icon('play', 14) + '开始';
       } else {
         t.interval = setInterval(tick, 1000);
-        actionBtn.innerHTML = ui.icon('pause', 14) + '暂停';
+        t.actionBtn.innerHTML = ui.icon('pause', 14) + '暂停';
       }
     };
     card.querySelector('[data-reset]').onclick = () => {
       if (t.interval) { clearInterval(t.interval); t.interval = null; }
       t.rem = TOMATO_WORK; t.total = TOMATO_WORK; t.mode = 'work';
-      timeEl.textContent = hms(t.rem);
-      arcEl.setAttribute('stroke-dashoffset', CIRC);
-      actionBtn.innerHTML = ui.icon('play', 14) + '开始';
-      modeLabel.textContent = '专注 25 分钟';
+      t.timeEl.textContent = hms(t.rem);
+      t.arcEl.setAttribute('stroke-dashoffset', CIRC);
+      t.actionBtn.innerHTML = ui.icon('play', 14) + '开始';
+      t.modeLabel.textContent = '专注 25 分钟';
     };
 
     t.card = card;
@@ -235,8 +242,15 @@
         <button class="icon-btn plain" data-del>${ui.icon('trash', 16)}</button>
       </div>`);
       const toggle = () => {
+        // 保存输入框内容，重渲后恢复（避免用户输入中途被清空）
+        const draftEl = document.querySelector('[data-new]');
+        const draft = draftEl ? draftEl.value : '';
         store.togglePlan(p.id);
         App.render();
+        if (draft) {
+          const restored = document.querySelector('[data-new]');
+          if (restored) { restored.value = draft; restored.focus(); }
+        }
       };
       it.querySelector('.check').onclick = toggle;
       it.querySelector('.txt').onclick = toggle;

@@ -137,6 +137,8 @@ ul{margin:0;padding:0;list-style:none}
   padding:calc(var(--safe-t) + 12px) 14px calc(84px + var(--safe-b));
   max-width:560px;width:100%;margin:0 auto;
 }
+.view.page-in{animation:pageIn .22s cubic-bezier(.22,1,.36,1)}
+@keyframes pageIn{from{opacity:.15;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* ========== 通用组件 ========== */
 .card{

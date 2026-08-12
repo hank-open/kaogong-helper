@@ -39,6 +39,10 @@
     else App.pages.home.render(view);
     renderTabs(hash);
     window.scrollTo(0, Math.min(y, document.body.scrollHeight));
+    // 页面切入动画
+    view.classList.remove('page-in');
+    void view.offsetWidth;
+    view.classList.add('page-in');
   }
 
   let lastHash = '';

@@ -335,7 +335,10 @@
 
   /* ---------------- 记录本次刷题（白色弹窗） ---------------- */
   function practiceDialog(moduleId, onDone) {
-    let mid = moduleId || store.MODULES[0].id;
+    // 记忆上次选的板块（当无外部指定时）
+    const LAST_MOD_KEY = '_gk_last_mod';
+    const lastMod = localStorage.getItem(LAST_MOD_KEY);
+    let mid = moduleId || (lastMod && store.MODULES.find((m) => m.id === lastMod) ? lastMod : store.MODULES[0].id);
     const body = u.el(`<div>
       <div class="field"><label>所属板块</label><div data-mods></div></div>
       <div class="field"><label>日期</label>${dateInput(u.today())}</div>
@@ -398,6 +401,7 @@
       if (correct > count) { shakeField($('[data-correct]')); return ui.toast('正确数不能大于做题数'); }
       store.addPractice({ moduleId: mid, date, count, correct, minutes, note: $('[data-note]').value.trim() });
       if ($('[data-ck]').checked && minutes > 0) store.addStudyHours(date, Math.round((minutes / 60) * 100) / 100);
+      localStorage.setItem(LAST_MOD_KEY, mid);
       ui.toast('已记录：' + store.module(mid).name + ' ' + count + ' 题，正确率 ' + (count ? u.pct(correct, count) + '%' : '—'));
       close();
       onDone && onDone();
@@ -407,6 +411,7 @@
     ui.sheet({
       title: '记录本次刷题',
       body,
+      maskClose: false,
       onMount: (box) => {
         $('[data-min]').onkeydown = (e) => {
           if (e.key === 'Enter') {
@@ -456,6 +461,7 @@
     ui.sheet({
       title: existing ? '编辑错题' : '添加错题',
       body,
+      maskClose: false,
       footer: [
         { text: '取消', cls: 'ghost', onClick: (c) => c() },
         {
@@ -554,6 +560,7 @@
     ui.sheet({
       title: existing ? '编辑复盘' : '新增每日复盘',
       body,
+      maskClose: false,
       footer: [
         { text: '取消', cls: 'ghost', onClick: (c) => c() },
         {

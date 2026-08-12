@@ -34,7 +34,7 @@
     shown.forEach((it, i) => {
       ibox.appendChild(
         u.el(`<div class="rv-item">
-        <div class="small strong"><span class="idx">${i + 1}</span>${u.esc(it.q || '（未填题目）')}</div>
+        <div class="small strong"><span class="idx">${i + 1}</span>${u.esc(it.q || (r.photos && r.photos.length ? '（见附图）' : r.audios && r.audios.length ? '（见语音）' : '（未填题目）'))}</div>
         ${it.a ? `<div class="kv"><span class="k">答案</span><span class="v">${u.esc(it.a)}</span></div>` : ''}
         ${it.k ? `<div class="kv"><span class="k">知识点</span><span class="v">${u.esc(it.k)}</span></div>` : ''}
       </div>`)
