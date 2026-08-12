@@ -30,4 +30,4 @@ http
     res.writeHead(200, { 'Content-Type': MIME[path.extname(file)] || 'application/octet-stream', 'Cache-Control': 'no-cache' });
     fs.createReadStream(file).pipe(res);
   })
-  .listen(port, () => console.log(`公考工作台 → http://localhost:${port}`));
+  .listen(port, () => console.log(`考公助手 → http://localhost:${port}`));

@@ -1,4 +1,4 @@
-/* 公考工作台 · 一体化服务（前端托管 + 账号 + 跨设备同步）
+/* 考公助手 · 一体化服务（前端托管 + 账号 + 跨设备同步）
  * 零运行时依赖，仅用 Node 内置模块。
  * 启动： node server-api.mjs [port]
  */
@@ -188,6 +188,6 @@ http
     }
   })
   .listen(port, () => {
-    console.log(`公考工作台 → http://localhost:${port}`);
+    console.log(`考公助手 → http://localhost:${port}`);
     console.log(`同步 API   → http://localhost:${port}/api/`);
   });

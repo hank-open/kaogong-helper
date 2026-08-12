@@ -1,4 +1,4 @@
-/* 公考工作台 · Service Worker（离线缓存静态资源） */
+/* 考公助手 · Service Worker（离线缓存静态资源） */
 const CACHE = 'gk-workbench-v2';
 const ASSETS = [
   './',

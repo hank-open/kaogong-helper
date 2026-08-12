@@ -1,7 +1,7 @@
 {
-  "name": "gk-workbench",
+  "name": "kaogong-helper",
   "version": "1.0.0",
-  "description": "公务员考试备考工作台（PWA + Capacitor 原生壳）",
+  "description": "考公助手 — 公务员考试备考工作台（PWA + Capacitor 原生壳）",
   "private": true,
   "type": "module",
   "scripts": {

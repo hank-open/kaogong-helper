@@ -245,7 +245,7 @@
         const img = new Image();
         img.src = canvas.toDataURL('image/png');
         img.style.cssText = 'width:220px;height:220px;border:1px solid #eee;border-radius:12px;background:#fff';
-        img.alt = '扫码打开公考工作台';
+        img.alt = '扫码打开考公助手';
         if (canvas.parentNode) canvas.parentNode.replaceChild(img, canvas);
       } catch (e) {
         if (urlEl) urlEl.textContent = '二维码生成失败：' + (e.message || e);

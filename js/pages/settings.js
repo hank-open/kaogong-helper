@@ -10,7 +10,7 @@
 
   function fileName(ext) {
     const d = new Date();
-    return `公考工作台备份_${d.getFullYear()}${u.pad(d.getMonth() + 1)}${u.pad(d.getDate())}_${u.pad(d.getHours())}${u.pad(d.getMinutes())}.${ext}`;
+    return `考公助手备份_${d.getFullYear()}${u.pad(d.getMonth() + 1)}${u.pad(d.getDate())}_${u.pad(d.getHours())}${u.pad(d.getMinutes())}.${ext}`;
   }
 
   async function saveBlob(blob, name) {
@@ -44,7 +44,7 @@
     try {
       const file = new File([blob], name, { type: 'application/json' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file], title: '公考工作台备份' });
+        await navigator.share({ files: [file], title: '考公助手备份' });
         return true;
       }
     } catch (e) {}
@@ -435,7 +435,7 @@
         const img = new Image();
         img.src = canvas.toDataURL('image/png');
         img.style.cssText = 'width:200px;height:200px;border:1px solid #eee;border-radius:10px;background:#fff';
-        img.alt = '扫码打开公考工作台';
+        img.alt = '扫码打开考公助手';
         canvas.parentNode.replaceChild(img, canvas);
       } catch (e) {
         urlEl.textContent = '二维码生成失败：' + (e.message || e);
