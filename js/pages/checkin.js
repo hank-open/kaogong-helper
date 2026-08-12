@@ -79,9 +79,9 @@
       const isToday = k === today;
       const future = k > today;
       const cell = u.el(`<div class="cal-cell ${c ? 'on' : ''} ${isToday ? 'today' : ''} ${future ? 'future' : ''}"
-        ${c ? `style="background:linear-gradient(140deg,${hourColor(c.hours)[0]},${hourColor(c.hours)[1]})"` : ''}>
+        style="cursor:${future ? 'default' : 'pointer'}${c ? ';background:linear-gradient(140deg,' + hourColor(c.hours)[0] + ',' + hourColor(c.hours)[1] + ')' : ''}">
         <span>${u.parse(k).getDate()}</span>${c ? `<span class="h">${c.hours}h</span>` : ''}</div>`);
-      cell.onclick = () => w.checkinDialog(k, App.render);
+      cell.onclick = () => { if (!future) w.checkinDialog(k, App.render); };
       grid.appendChild(cell);
     });
 

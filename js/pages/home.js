@@ -203,9 +203,9 @@
         <button class="sec-more" data-more>全部统计${ui.icon('right', 13)}</button></div>
       <div class="stat-grid">
         <div class="stat" style="background:linear-gradient(135deg,#F58AAB,#D5578A)"><div class="v">${st.count}</div><div class="k">做题数</div></div>
-        <div class="stat" style="background:linear-gradient(135deg,#7FA9DE,#4E7FC1)"><div class="v">${st.count ? st.acc : 0}<small>%</small></div><div class="k">正确率</div></div>
-        <div class="stat" style="background:linear-gradient(135deg,#5FBBA3,#2F9C82)"><div class="v">${ck ? ck.hours : 0}<small>h</small></div><div class="k">学习时长</div></div>
-        <div class="stat" style="background:linear-gradient(135deg,#A98BD4,#7B5FC0)" data-ck><div class="v">${ck ? '✓' : '+'}</div><div class="k">${ck ? '已打卡' : '去打卡'}</div></div>
+        <div class="stat" style="background:linear-gradient(135deg,#7FA9DE,#4E7FC1)"><div class="v">${st.count ? st.acc + '<small>%</small>' : '<small style="font-size:15px">—</small>'}</div><div class="k">正确率</div></div>
+        <div class="stat" style="background:linear-gradient(135deg,#5FBBA3,#2F9C82)"><div class="v">${ck ? ck.hours : '—'}</div><div class="k">打卡时长</div></div>
+        <div class="stat" style="background:linear-gradient(135deg,#A98BD4,#7B5FC0);cursor:pointer" data-ck><div class="v">${ck ? '✓' : '+'}</div><div class="k">${ck ? '已打卡' : '去打卡'}</div></div>
       </div>
       <button class="btn primary block" data-rec style="margin-top:12px">${ui.icon('plus', 17)}记录本次刷题</button>
     </div>`);

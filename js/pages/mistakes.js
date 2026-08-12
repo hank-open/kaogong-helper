@@ -79,22 +79,25 @@
       };
       chips.appendChild(c);
     });
+    const box = root.querySelector('[data-list]');
+    const renderList = (q) => {
+      const w = (q !== undefined ? q : kw).trim().toLowerCase();
+      let list = all.slice();
+      if (filter === 'todo') list = list.filter((m) => !m.mastered);
+      else if (filter !== 'all') list = list.filter((m) => m.moduleId === filter);
+      if (w) list = list.filter((m) => (m.title + ' ' + (m.knowledge || '') + ' ' + (m.answer || '')).toLowerCase().includes(w));
+      box.innerHTML = '';
+      if (!list.length) box.appendChild(u.el('<div class="card"><div class="empty"><div class="big">没有匹配的错题</div>点击右下角「+」添加，可拍照、录语音条并自动转文字</div></div>'));
+      list.forEach((m) => box.appendChild(card(m, App.render)));
+    };
+
     const kwInp = root.querySelector('[data-kw]');
     kwInp.oninput = u.debounce(() => {
-      kw = kwInp.value.trim();
-      App.render();
-      const n = document.querySelector('[data-kw]');
-      if (n) (n.focus(), n.setSelectionRange(n.value.length, n.value.length));
-    }, 400);
+      kw = kwInp.value;
+      renderList(kw);
+    }, 280);
 
-    let list = all.slice();
-    if (filter === 'todo') list = list.filter((m) => !m.mastered);
-    else if (filter !== 'all') list = list.filter((m) => m.moduleId === filter);
-    if (kw) list = list.filter((m) => (m.title + ' ' + (m.knowledge || '') + ' ' + (m.answer || '')).toLowerCase().includes(kw.toLowerCase()));
-
-    const box = root.querySelector('[data-list]');
-    if (!list.length) box.appendChild(u.el('<div class="card"><div class="empty"><div class="big">没有匹配的错题</div>点击右下角「+」添加，可拍照、录语音条并自动转文字</div></div>'));
-    list.forEach((m) => box.appendChild(card(m, App.render)));
+    renderList();
 
     view.innerHTML = '';
     view.appendChild(root);

@@ -267,7 +267,7 @@
       <label style="display:block;font-size:12.5px;font-weight:800;color:var(--ink-2);margin-bottom:6px">${u.esc(opt.label || '图片 / 语音')}</label>
       <div data-photos></div>
       <div data-audios style="margin-top:9px"></div>
-      <button class="btn mini ghost" data-rec style="margin-top:9px">${ui.icon('mic', 15)}按住说话·录语音条</button>
+      <button class="btn mini ghost" data-rec style="margin-top:9px">${ui.icon('mic', 15)}点击录音·生成语音条</button>
     </div>`);
     wrap.querySelector('[data-photos]').appendChild(photoStrip(value.photos));
     const abox = wrap.querySelector('[data-audios]');
@@ -314,71 +314,114 @@
     return `<input type="date" class="input" value="${v || u.today()}">`;
   }
 
+  /* ---------------- 表单字段抖动提示 ---------------- */
+  function shakeField(el) {
+    el.style.borderColor = '#E05050';
+    el.style.boxShadow = '0 0 0 3px rgba(224,80,80,.16)';
+    el.animate([
+      { transform: 'translateX(0)' },
+      { transform: 'translateX(-5px)' },
+      { transform: 'translateX(5px)' },
+      { transform: 'translateX(-4px)' },
+      { transform: 'translateX(4px)' },
+      { transform: 'translateX(0)' },
+    ], { duration: 320, easing: 'ease-out' });
+    el.focus();
+    setTimeout(() => {
+      el.style.borderColor = '';
+      el.style.boxShadow = '';
+    }, 1400);
+  }
+
   /* ---------------- 记录本次刷题（白色弹窗） ---------------- */
   function practiceDialog(moduleId, onDone) {
     let mid = moduleId || store.MODULES[0].id;
-    const m = store.module(mid);
     const body = u.el(`<div>
       <div class="field"><label>所属板块</label><div data-mods></div></div>
       <div class="field"><label>日期</label>${dateInput(u.today())}</div>
       <div class="grid2">
-        <div class="field"><label>做题数目</label><input type="number" inputmode="numeric" class="input" data-count placeholder="如 30"></div>
-        <div class="field"><label>正确数目</label><input type="number" inputmode="numeric" class="input" data-correct placeholder="如 24"></div>
+        <div class="field"><label>做题数目</label><input type="number" inputmode="numeric" class="input" data-count placeholder="30"></div>
+        <div class="field"><label>正确数目</label><input type="number" inputmode="numeric" class="input" data-correct placeholder="填写后自动计算正确率"></div>
       </div>
       <div class="field"><label>本次做题时间（分钟）</label>
-        <input type="number" inputmode="numeric" class="input" data-min placeholder="如 35">
-        <div class="chips" style="margin-top:8px">
+        <input type="number" inputmode="numeric" class="input" data-min placeholder="如 35，不填则不计入打卡时长">
+        <div class="chips" style="margin-top:8px" data-qchips>
           ${[10, 15, 20, 30, 45, 60, 90, 120].map((v) => `<button class="chip" data-q="${v}">${v}分</button>`).join('')}
         </div>
       </div>
-      <div class="card tight" style="margin:0 0 12px;background:#FFF6F9;box-shadow:none;border:1px solid rgba(201,85,122,.12)">
+      <div class="card tight" style="margin:0 0 12px;background:var(--rose-tint);box-shadow:none;border:1px solid rgba(74,143,232,.15)">
         <div class="spread"><span class="small strong">本次正确率</span><span class="strong" data-acc style="font-size:20px;color:var(--rose-deep)">—</span></div>
       </div>
       <div class="field"><label>备注（可选）</label><textarea class="textarea" data-note style="min-height:56px" placeholder="例如：细节理解题错得多，速度偏慢"></textarea></div>
-      <label class="row small" style="gap:8px;margin-bottom:2px">
-        <input type="checkbox" data-ck ${store.state.settings.autoCheckin ? 'checked' : ''} style="width:17px;height:17px;accent-color:#E0658F">
+      <label class="row small" style="gap:8px;margin-bottom:2px;cursor:pointer">
+        <input type="checkbox" data-ck ${store.state.settings.autoCheckin ? 'checked' : ''} style="width:17px;height:17px;accent-color:var(--rose)">
         <span class="muted">同时计入当日打卡学习时长</span>
       </label>
     </div>`);
 
     body.querySelector('[data-mods]').appendChild(moduleChips(mid, (id) => (mid = id)));
     const $ = (s) => body.querySelector(s);
+
     const upd = () => {
-      const c = u.num($('[data-count]').value),
-        k = u.num($('[data-correct]').value);
+      const c = u.num($('[data-count]').value);
+      let k = u.num($('[data-correct]').value);
+      if (c && k > c) { k = c; $('[data-correct]').value = c; }
       $('[data-acc]').textContent = c ? u.pct(k, c) + '%' : '—';
       if (c) $('[data-acc]').style.color = u.accColor(u.pct(k, c));
     };
     $('[data-count]').oninput = upd;
     $('[data-correct]').oninput = upd;
-    body.querySelectorAll('[data-q]').forEach((b) => (b.onclick = () => ($('[data-min]').value = b.dataset.q)));
+
+    // 时间 chip：点选高亮 + 填入
+    body.querySelectorAll('[data-q]').forEach((b) => {
+      b.onclick = () => {
+        $('[data-min]').value = b.dataset.q;
+        body.querySelectorAll('[data-q]').forEach((x) => x.classList.toggle('on', x === b));
+      };
+    });
+    // 手动改时间时取消 chip 高亮
+    $('[data-min]').oninput = () => {
+      body.querySelectorAll('[data-q]').forEach((x) => x.classList.remove('on'));
+    };
+
+    // 键盘流：做题数 Enter → 正确数 → 时间 → 保存
+    $('[data-count]').onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); $('[data-correct]').focus(); $('[data-correct]').select(); } };
+    $('[data-correct]').onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); $('[data-min]').focus(); $('[data-min]').select(); } };
+    $('[data-min]').onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); saveBtn.click(); } };
+
+    const doSave = (close) => {
+      const count = u.num($('[data-count]').value);
+      const correct = u.num($('[data-correct]').value);
+      const minutes = u.num($('[data-min]').value);
+      const date = $('input[type=date]').value || u.today();
+      if (!count) return shakeField($('[data-count]'));
+      if (correct > count) { shakeField($('[data-correct]')); return ui.toast('正确数不能大于做题数'); }
+      store.addPractice({ moduleId: mid, date, count, correct, minutes, note: $('[data-note]').value.trim() });
+      if ($('[data-ck]').checked && minutes > 0) store.addStudyHours(date, Math.round((minutes / 60) * 100) / 100);
+      ui.toast('已记录：' + store.module(mid).name + ' ' + count + ' 题，正确率 ' + (count ? u.pct(correct, count) + '%' : '—'));
+      close();
+      onDone && onDone();
+    };
+    $('[data-min]').onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); /* trigger via onMount */ } };
 
     ui.sheet({
       title: '记录本次刷题',
       body,
+      onMount: (box) => {
+        $('[data-min]').onkeydown = (e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            const btns = box.querySelectorAll('.sheet-foot .btn');
+            btns[btns.length - 1] && btns[btns.length - 1].click();
+          }
+        };
+      },
       footer: [
         { text: '取消', cls: 'ghost', onClick: (c) => c() },
-        {
-          text: '保存记录',
-          cls: 'primary',
-          icon: 'check',
-          onClick: (close) => {
-            const count = u.num($('[data-count]').value);
-            const correct = u.num($('[data-correct]').value);
-            const minutes = u.num($('[data-min]').value);
-            const date = $('input[type=date]').value || u.today();
-            if (!count) return ui.toast('请填写做题数目');
-            if (correct > count) return ui.toast('正确数不能大于做题数');
-            store.addPractice({ moduleId: mid, date, count, correct, minutes, note: $('[data-note]').value.trim() });
-            if ($('[data-ck]').checked && minutes > 0) store.addStudyHours(date, Math.round((minutes / 60) * 100) / 100);
-            ui.toast('已记录：' + store.module(mid).name + ' ' + count + ' 题');
-            close();
-            onDone && onDone();
-          },
-        },
+        { text: '保存记录', cls: 'primary', icon: 'check', onClick: doSave },
       ],
     });
-    setTimeout(() => body.querySelector('[data-count]').focus(), 300);
+    setTimeout(() => $('[data-count]').focus(), 300);
   }
 
   /* ---------------- 错题弹窗 ---------------- */
@@ -420,17 +463,21 @@
           cls: 'primary',
           icon: 'check',
           onClick: (close) => {
+            const titleEl = body.querySelector('[data-title]');
             const rec = {
               moduleId: mid,
               date: body.querySelector('input[type=date]').value || u.today(),
-              title: body.querySelector('[data-title]').value.trim(),
+              title: titleEl.value.trim(),
               mine: body.querySelector('[data-mine]').value.trim(),
               answer: body.querySelector('[data-ans]').value.trim(),
               knowledge: know.value.trim(),
               photos: val.photos,
               audios: val.audios,
             };
-            if (!rec.title && !rec.photos.length && !rec.audios.length) return ui.toast('请至少填写题目或添加图片/语音');
+            if (!rec.title && !rec.photos.length && !rec.audios.length) {
+              shakeField(titleEl);
+              return ui.toast('请至少填写题目或添加图片/语音');
+            }
             existing ? store.updMistake(existing.id, rec) : store.addMistake(rec);
             ui.toast('错题已保存');
             close();
@@ -439,6 +486,7 @@
         },
       ],
     });
+    setTimeout(() => body.querySelector('[data-title]').focus(), 300);
   }
 
   /* ---------------- 每日复盘弹窗 ---------------- */
@@ -533,6 +581,14 @@
   }
 
   /* ---------------- 考试倒计时弹窗 ---------------- */
+  const EXAM_NAME_HINTS = {
+    国考: '2027 国家公务员考试',
+    省考: '2027 省公务员考试',
+    事业编: '2027 事业单位联考',
+    选调生: '2027 选调生考试',
+    教师编: '2027 教师编制考试',
+    其他: '',
+  };
   function examDialog(existing, onDone) {
     const e = existing || {};
     let type = e.type || '国考';
@@ -547,20 +603,24 @@
         ${store.EXAM_COLORS.map((c, i) => `<button data-c="${i}" style="width:32px;height:32px;border-radius:11px;background:linear-gradient(135deg,${c[0]},${c[1]});box-shadow:${i === ci ? '0 0 0 3px rgba(201,85,122,.35)' : '0 3px 8px rgba(0,0,0,.12)'}"></button>`).join('')}
       </div></div>
     </div>`);
-    body.querySelectorAll('[data-t]').forEach(
-      (b) =>
-        (b.onclick = () => {
-          type = b.dataset.t;
-          body.querySelectorAll('[data-t]').forEach((x) => x.classList.toggle('on', x === b));
-        })
-    );
-    body.querySelectorAll('[data-c]').forEach(
-      (b) =>
-        (b.onclick = () => {
-          ci = +b.dataset.c;
-          body.querySelectorAll('[data-c]').forEach((x, i) => (x.style.boxShadow = i === ci ? '0 0 0 3px rgba(201,85,122,.35)' : '0 3px 8px rgba(0,0,0,.12)'));
-        })
-    );
+    const nameInp = body.querySelector('[data-name]');
+    body.querySelectorAll('[data-t]').forEach((b) => {
+      b.onclick = () => {
+        type = b.dataset.t;
+        body.querySelectorAll('[data-t]').forEach((x) => x.classList.toggle('on', x === b));
+        // 名称为空时自动填入提示名
+        if (!nameInp.value.trim() && EXAM_NAME_HINTS[type]) {
+          nameInp.value = EXAM_NAME_HINTS[type];
+          nameInp.select();
+        }
+      };
+    });
+    body.querySelectorAll('[data-c]').forEach((b) => {
+      b.onclick = () => {
+        ci = +b.dataset.c;
+        body.querySelectorAll('[data-c]').forEach((x, i) => (x.style.boxShadow = i === ci ? '0 0 0 3px rgba(201,85,122,.35)' : '0 3px 8px rgba(0,0,0,.12)'));
+      };
+    });
 
     ui.sheet({
       title: existing ? '编辑考试' : '添加考试倒计时',
@@ -571,9 +631,9 @@
           text: '保存',
           cls: 'primary',
           onClick: (close) => {
-            const name = body.querySelector('[data-name]').value.trim();
+            const name = nameInp.value.trim();
             const date = body.querySelector('input[type=date]').value;
-            if (!name) return ui.toast('请填写考试名称');
+            if (!name) return shakeField(nameInp);
             if (!date) return ui.toast('请选择考试日期');
             const rec = { name, type, date, colorIndex: ci };
             if (existing) Object.assign(existing, rec), store.save();
@@ -584,6 +644,7 @@
         },
       ],
     });
+    setTimeout(() => { if (!nameInp.value) nameInp.focus(); }, 300);
   }
 
   /* ---------------- 打卡时长滚轮弹窗 ---------------- */
@@ -594,7 +655,17 @@
     const curH = cur ? Math.floor(cur.hours) : 2;
     const curM = cur ? mins.reduce((p, c) => (Math.abs(c - Math.round((cur.hours % 1) * 60)) < Math.abs(p - Math.round((cur.hours % 1) * 60)) ? c : p), 0) : 0;
 
+    // 快捷时长：点一下直接跳轮
+    const quickOpts = [
+      { label: '30分', h: 0, m: 30 },
+      { label: '1小时', h: 1, m: 0 },
+      { label: '1.5h', h: 1, m: 30 },
+      { label: '2小时', h: 2, m: 0 },
+      { label: '3小时', h: 3, m: 0 },
+    ];
+
     let noteEl = null;
+    let wheelHandles = null;  // {setH, setM} injected via onMount
     ui.wheelPick({
       title: `${u.fmtDate(date, 'mdw')} 打卡`,
       desc: '滚动选择当天学习时长',
@@ -602,7 +673,12 @@
         { values: hours, value: curH, unit: '小时' },
         { values: mins, value: curM, unit: '分钟', format: (v) => u.pad(v) },
       ],
-      extra: `<div class="field" style="margin-top:10px"><label>今日备注（可选）</label><input class="input" data-note placeholder="今天学了什么…" value="${u.esc(cur ? cur.note || '' : '')}"></div>
+      extra: `<div style="margin-bottom:10px">
+          <div class="chips" data-quick style="gap:6px;flex-wrap:wrap">
+            ${quickOpts.map((q) => `<button class="chip" data-qh="${q.h}" data-qm="${q.m}">${q.label}</button>`).join('')}
+          </div>
+        </div>
+        <div class="field" style="margin-top:6px"><label>今日备注（可选）</label><input class="input" data-note placeholder="今天学了什么…" value="${u.esc(cur ? cur.note || '' : '')}"></div>
         ${cur ? '<button class="btn mini ghost block" data-cancel style="margin-top:2px">取消当日打卡</button>' : ''}`,
       onMount: (box, close) => {
         noteEl = box.querySelector('[data-note]');
@@ -616,6 +692,22 @@
               onDone && onDone();
             }
           };
+        // 快捷选取：直接设置滚轮 scrollTop（每格 42px）
+        box.querySelectorAll('[data-qh]').forEach((btn) => {
+          btn.onclick = () => {
+            const qh = +btn.dataset.qh;
+            const qm = +btn.dataset.qm;
+            box.querySelectorAll('[data-qh]').forEach((x) => x.classList.remove('on'));
+            btn.classList.add('on');
+            const ITEM_H = 42;
+            const wheels = box.querySelectorAll('.wheel');
+            if (wheels[0]) wheels[0].scrollTo({ top: qh * ITEM_H, behavior: 'smooth' });
+            if (wheels[1]) {
+              const mIdx = mins.indexOf(qm);
+              if (mIdx >= 0) wheels[1].scrollTo({ top: mIdx * ITEM_H, behavior: 'smooth' });
+            }
+          };
+        });
       },
       onOk: (vals) => {
         const h = Math.round((vals[0] + vals[1] / 60) * 100) / 100;
