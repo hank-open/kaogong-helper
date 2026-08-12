@@ -8,6 +8,125 @@
 
   let type = '行测';
 
+  /* ── 模拟考计时器 ── */
+  const SIM_PRESETS = [
+    { label: '行测', minutes: 110 },
+    { label: '申论', minutes: 180 },
+    { label: '综应', minutes: 120 },
+    { label: '公基', minutes: 90 },
+    { label: '自定义', minutes: 0 },
+  ];
+
+  function startSimTimer() {
+    const u2 = App.u, ui2 = App.ui;
+    const preset = SIM_PRESETS.find((p) => p.label === type) || SIM_PRESETS[0];
+    const defaultMin = preset.minutes || 120;
+
+    const body = u2.el(`<div>
+      <div class="small muted" style="margin-bottom:12px;line-height:1.7">选择考试类型，全屏显示倒计时。计时结束后可直接录入本次试卷成绩。</div>
+      <div class="chips" style="flex-wrap:wrap;gap:8px;margin-bottom:13px" data-presets></div>
+      <div class="field"><label>时长（分钟）</label>
+        <input type="number" inputmode="numeric" class="input" data-min value="${defaultMin}" min="1" max="360"></div>
+    </div>`);
+    let selMin = defaultMin;
+    let selLabel = type;
+    const presetsBox = body.querySelector('[data-presets]');
+    const minInp = body.querySelector('[data-min]');
+    SIM_PRESETS.forEach((p) => {
+      if (p.label === '自定义') return;
+      const c = u2.el(`<button class="chip ${p.label === type ? 'on' : ''}">${p.label} ${p.minutes}分</button>`);
+      c.onclick = () => {
+        selMin = p.minutes; selLabel = p.label;
+        minInp.value = p.minutes;
+        presetsBox.querySelectorAll('.chip').forEach((x) => x.classList.remove('on'));
+        c.classList.add('on');
+      };
+      presetsBox.appendChild(c);
+    });
+    minInp.oninput = () => {
+      selMin = parseInt(minInp.value) || defaultMin;
+      presetsBox.querySelectorAll('.chip').forEach((x) => x.classList.remove('on'));
+    };
+
+    ui2.sheet({
+      title: '模拟考计时',
+      body,
+      footer: [
+        { text: '取消', cls: 'ghost', onClick: (c) => c() },
+        { text: '开始计时', cls: 'primary', onClick: (close) => {
+          const mins = parseInt(minInp.value) || defaultMin;
+          if (mins < 1 || mins > 360) return ui2.toast('请设置 1~360 分钟');
+          close();
+          runSimOverlay(selLabel, mins);
+        }},
+      ],
+    });
+  }
+
+  function runSimOverlay(label, minutes) {
+    const u2 = App.u, ui2 = App.ui;
+    let total = minutes * 60;
+    let rem = total;
+    let paused = false;
+    let iv = null;
+
+    const overlay = u2.el(`<div class="sim-overlay blue-bg">
+      <div class="sim-name">${u2.esc(label)} 模拟考</div>
+      <div class="sim-time-big" data-time></div>
+      <div class="sim-label" data-label>剩余时间</div>
+      <div class="sim-progress"><div class="sim-progress-fill" data-fill style="width:100%"></div></div>
+      <div class="sim-acts">
+        <button class="btn primary" data-pp style="min-width:100px">${ui2.icon('pause',18)}暂停</button>
+        <button class="btn ghost" data-end style="min-width:80px">结束</button>
+      </div>
+    </div>`);
+    document.body.appendChild(overlay);
+
+    function hms2(s) {
+      const h = Math.floor(s / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const ss = s % 60;
+      return (h ? App.u.pad(h) + ':' : '') + App.u.pad(m) + ':' + App.u.pad(ss);
+    }
+    const timeEl = overlay.querySelector('[data-time]');
+    const fillEl = overlay.querySelector('[data-fill]');
+    const labelEl = overlay.querySelector('[data-label]');
+    const ppBtn = overlay.querySelector('[data-pp]');
+
+    function update() {
+      timeEl.textContent = hms2(rem);
+      fillEl.style.width = (rem / total * 100) + '%';
+    }
+    update();
+
+    function tick() {
+      if (!paused) {
+        rem--;
+        update();
+        if (rem <= 0) {
+          clearInterval(iv);
+          labelEl.textContent = '时间到！';
+          timeEl.textContent = '00:00';
+          ppBtn.disabled = true;
+          ui2.toast('考试时间结束，请停笔！');
+        }
+      }
+    }
+    iv = setInterval(tick, 1000);
+
+    ppBtn.onclick = () => {
+      paused = !paused;
+      ppBtn.innerHTML = paused ? ui2.icon('play', 18) + '继续' : ui2.icon('pause', 18) + '暂停';
+    };
+    overlay.querySelector('[data-end]').onclick = () => {
+      clearInterval(iv);
+      overlay.remove();
+      const used = minutes - Math.floor(rem / 60);
+      ui2.toast('计时结束，已用 ' + used + ' 分钟');
+      paperDialog(null, App.render);
+    };
+  }
+
   function totals(p) {
     const secs = p.sections || [];
     const cnt = u.sum(secs, (s) => u.num(s.count));
@@ -68,7 +187,8 @@
     const chron = list.slice().reverse();
 
     const root = u.el(`<div>
-      <div class="page-head"><div class="grow"><h1>试卷分析</h1><div class="sub">共 ${all.length} 套 · ${u.esc(type)} ${list.length} 套</div></div></div>
+      <div class="page-head"><div class="grow"><h1>试卷分析</h1><div class="sub">共 ${all.length} 套 · ${u.esc(type)} ${list.length} 套</div></div>
+        <button class="btn mini primary" data-sim style="gap:5px">${ui.icon('clock', 14)}模拟计时</button></div>
       <div class="card tight"><div class="chips" data-types></div></div>
       <div class="card">
         <div class="sec-head"><div class="sec-title"><i class="dot"></i>${u.esc(type)} 成绩趋势</div>
@@ -81,6 +201,8 @@
       </div>
       <div data-list></div>
     </div>`);
+
+    root.querySelector('[data-sim]').onclick = () => startSimTimer();
 
     const chips = root.querySelector('[data-types]');
     Object.keys(store.PAPER_TYPES).forEach((t) => {

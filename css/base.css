@@ -33,6 +33,80 @@
   --safe-t:env(safe-area-inset-top,0px);
 }
 
+/* ========== 主题皮肤 ========== */
+/* 墨绿专注 */
+[data-accent="green"]{
+  --rose:#3FAF84;--rose-deep:#1E8C63;--rose-soft:#8FD8BA;--rose-tint:#E6F8F1;
+  --ink:#1A3428;--ink-2:#3A6652;--ink-3:#7AA994;
+  --line:rgba(31,140,99,.14);
+  --shadow:0 10px 26px rgba(20,110,70,.13);
+  --shadow-lg:0 18px 44px rgba(15,90,55,.20);
+}
+[data-accent="green"] body{background:linear-gradient(170deg,#EDFAF3 0%,#E4F5EC 34%,#EBF8F3 68%,#EFF9F5 100%)}
+[data-accent="green"] .btn.primary{background:linear-gradient(135deg,#4FC99A,#1E8C63)}
+[data-accent="green"] .chip.on{background:linear-gradient(135deg,#4FC99A,#1E8C63)}
+[data-accent="green"] .fab{background:linear-gradient(135deg,#4FC99A,#1E8C63)}
+[data-accent="green"] .check.on{background:linear-gradient(135deg,#4FC99A,#1E8C63)}
+[data-accent="green"] .bar-fill{background:linear-gradient(90deg,#8FD8BA,#1E8C63)}
+[data-accent="green"] .tab.on .ic{background:linear-gradient(135deg,rgba(79,201,154,.22),rgba(30,140,99,.16))}
+[data-accent="green"] .btn.primary,.chip.on,.tab.on{--rose-deep:#1E8C63}
+
+/* 暖橙活力 */
+[data-accent="orange"]{
+  --rose:#F0874A;--rose-deep:#D4581A;--rose-soft:#FAC09A;--rose-tint:#FEF0E6;
+  --ink:#3A1F0A;--ink-2:#7A4020;--ink-3:#B87848;
+  --line:rgba(212,88,26,.14);
+  --shadow:0 10px 26px rgba(180,70,20,.13);
+  --shadow-lg:0 18px 44px rgba(160,55,10,.20);
+}
+[data-accent="orange"] body{background:linear-gradient(170deg,#FEF5EE 0%,#FDF0E6 34%,#FEF3EC 68%,#FFF6EF 100%)}
+[data-accent="orange"] .btn.primary{background:linear-gradient(135deg,#F5A070,#D4581A)}
+[data-accent="orange"] .chip.on{background:linear-gradient(135deg,#F5A070,#D4581A)}
+[data-accent="orange"] .fab{background:linear-gradient(135deg,#F5A070,#D4581A)}
+[data-accent="orange"] .check.on{background:linear-gradient(135deg,#F5A070,#D4581A)}
+[data-accent="orange"] .bar-fill{background:linear-gradient(90deg,#FAC09A,#D4581A)}
+[data-accent="orange"] .tab.on .ic{background:linear-gradient(135deg,rgba(245,160,112,.22),rgba(212,88,26,.16))}
+
+/* 浅色简约 */
+[data-accent="light"]{
+  --rose:#5B7FA6;--rose-deep:#3A5F8A;--rose-soft:#A8C0D8;--rose-tint:#F0F4F8;
+  --ink:#1A2333;--ink-2:#445566;--ink-3:#8899AA;
+  --line:rgba(58,95,138,.12);
+  --shadow:0 6px 18px rgba(30,50,90,.09);
+  --shadow-lg:0 14px 36px rgba(20,40,80,.14);
+}
+[data-accent="light"] body{background:linear-gradient(170deg,#F7F9FC 0%,#F2F5FA 34%,#F5F7FB 68%,#F8FAFD 100%)}
+[data-accent="light"] .btn.primary{background:linear-gradient(135deg,#7A9EC4,#3A5F8A)}
+[data-accent="light"] .chip.on{background:linear-gradient(135deg,#7A9EC4,#3A5F8A)}
+[data-accent="light"] .fab{background:linear-gradient(135deg,#7A9EC4,#3A5F8A)}
+[data-accent="light"] .check.on{background:linear-gradient(135deg,#7A9EC4,#3A5F8A)}
+[data-accent="light"] .bar-fill{background:linear-gradient(90deg,#A8C0D8,#3A5F8A)}
+[data-accent="light"] .tab.on .ic{background:linear-gradient(135deg,rgba(122,158,196,.22),rgba(58,95,138,.16))}
+
+/* ========== 深色模式 ========== */
+[data-dark="1"]{
+  --card:rgba(30,40,60,.88);
+  --card-solid:#1E2840;
+  --line:rgba(255,255,255,.1);
+  --shadow:0 10px 26px rgba(0,0,0,.35);
+  --shadow-lg:0 18px 44px rgba(0,0,0,.50);
+}
+[data-dark="1"] body{background:linear-gradient(170deg,#0F1626 0%,#141C34 34%,#121A2E 68%,#111624 100%);color:#E8EDF5}
+[data-dark="1"] .card{border-color:rgba(255,255,255,.08)}
+[data-dark="1"] .input,[data-dark="1"] .textarea,[data-dark="1"] .select{background:#1A2540;border-color:rgba(255,255,255,.14);color:#E8EDF5}
+[data-dark="1"] .input:focus,[data-dark="1"] .textarea:focus{background:#1E2C4A}
+[data-dark="1"] .tabbar{background:rgba(18,24,44,.88)}
+[data-dark="1"] .sheet{background:#1A2438}
+[data-dark="1"] .grab{background:#2A3550}
+[data-dark="1"] .btn{background:rgba(255,255,255,.12);color:#B8CCEE}
+[data-dark="1"] .btn.ghost{background:rgba(255,255,255,.07)}
+[data-dark="1"] .chip{background:rgba(255,255,255,.1);color:#B8CCEE}
+[data-dark="1"] .icon-btn{background:rgba(255,255,255,.1)}
+[data-dark="1"] .bar-track{background:rgba(255,255,255,.1)}
+[data-dark="1"] .app-bg .blob{opacity:.18}
+[data-dark="1"] .voice-text{background:#1A2A44}
+[data-dark="1"] .rec-asr{background:#1A2A44}
+
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{

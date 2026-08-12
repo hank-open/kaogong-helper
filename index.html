@@ -15,6 +15,17 @@
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="考公助手" />
 <link rel="apple-touch-icon" href="favicon.svg" />
+<script>
+  (function(){
+    try{
+      var s=JSON.parse(localStorage.getItem('gk_workbench_state_v1')||'{}');
+      var cfg=s.settings||{};
+      var el=document.documentElement;
+      if(cfg.darkMode)el.setAttribute('data-dark','1');
+      if(cfg.accent&&cfg.accent!=='blue')el.setAttribute('data-accent',cfg.accent);
+    }catch(e){}
+  })();
+</script>
 </head>
 <body>
   <div class="app-bg"><span class="blob b1"></span><span class="blob b2"></span><span class="blob b3"></span></div>

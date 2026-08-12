@@ -59,6 +59,99 @@
     return card;
   }
 
+  /* ── 番茄钟 ── */
+  let tmr = null;  // {rem, total, mode, interval, card}
+  const TOMATO_WORK = 25 * 60;
+  const TOMATO_BREAK = 5 * 60;
+
+  function hms(sec) {
+    const m = Math.floor(sec / 60);
+    const s2 = sec % 60;
+    return u.pad(m) + ':' + u.pad(s2);
+  }
+
+  function buildTomatoCard() {
+    if (!tmr) tmr = { rem: TOMATO_WORK, total: TOMATO_WORK, mode: 'work', interval: null };
+    const t = tmr;
+
+    const card = u.el(`<div class="tomato-card">
+      <div class="sec-head"><div class="sec-title"><i class="dot"></i>番茄钟</div>
+        <span class="tiny muted" data-mode-label>${t.mode === 'work' ? '专注 25 分钟' : '休息 5 分钟'}</span></div>
+      <div style="display:flex;align-items:center;gap:18px">
+        <div class="tomato-ring">
+          <svg width="110" height="110" viewBox="0 0 110 110">
+            <circle class="tr-bg" cx="55" cy="55" r="46"/>
+            <circle class="tr-fill" data-arc cx="55" cy="55" r="46" stroke-dasharray="289" stroke-dashoffset="${289 - (289 * t.rem / t.total)}"/>
+          </svg>
+          <div class="tomato-time" data-time>${hms(t.rem)}</div>
+        </div>
+        <div style="flex:1">
+          <div style="font-size:13px;color:var(--ink-3);font-weight:700;margin-bottom:10px" data-sessions>今日已完成 <b style="color:var(--rose-deep)">${store.state.settings.tomatoToday || 0}</b> 个番茄</div>
+          <div class="tomato-row" style="justify-content:flex-start">
+            <button class="btn mini primary" data-action>${tmr.interval ? ui.icon('pause', 14) + '暂停' : ui.icon('play', 14) + '开始'}</button>
+            <button class="btn mini ghost" data-reset>${ui.icon('refresh', 14)}重置</button>
+          </div>
+        </div>
+      </div>
+    </div>`);
+
+    const timeEl = card.querySelector('[data-time]');
+    const arcEl = card.querySelector('[data-arc]');
+    const modeLabel = card.querySelector('[data-mode-label]');
+    const actionBtn = card.querySelector('[data-action]');
+    const sessEl = card.querySelector('[data-sessions]');
+    const CIRC = 289;
+
+    function tick() {
+      t.rem--;
+      timeEl.textContent = hms(t.rem);
+      arcEl.setAttribute('stroke-dashoffset', CIRC - (CIRC * t.rem / t.total));
+      if (t.rem <= 0) {
+        clearInterval(t.interval);
+        t.interval = null;
+        actionBtn.innerHTML = ui.icon('play', 14) + '开始';
+        if (t.mode === 'work') {
+          const today = store.state.settings.tomatoDate;
+          if (today !== u.today()) { store.state.settings.tomatoToday = 0; store.state.settings.tomatoDate = u.today(); }
+          store.state.settings.tomatoToday = (store.state.settings.tomatoToday || 0) + 1;
+          store.save();
+          sessEl.innerHTML = '今日已完成 <b style="color:var(--rose-deep)">' + store.state.settings.tomatoToday + '</b> 个番茄';
+          t.mode = 'break'; t.rem = TOMATO_BREAK; t.total = TOMATO_BREAK;
+          modeLabel.textContent = '休息 5 分钟';
+          ui.toast('专注结束！休息 5 分钟 🎉');
+        } else {
+          t.mode = 'work'; t.rem = TOMATO_WORK; t.total = TOMATO_WORK;
+          modeLabel.textContent = '专注 25 分钟';
+          ui.toast('休息结束，准备下一个番茄 💪');
+        }
+        timeEl.textContent = hms(t.rem);
+        arcEl.setAttribute('stroke-dashoffset', CIRC - (CIRC * t.rem / t.total));
+      }
+    }
+
+    actionBtn.onclick = () => {
+      if (t.interval) {
+        clearInterval(t.interval);
+        t.interval = null;
+        actionBtn.innerHTML = ui.icon('play', 14) + '开始';
+      } else {
+        t.interval = setInterval(tick, 1000);
+        actionBtn.innerHTML = ui.icon('pause', 14) + '暂停';
+      }
+    };
+    card.querySelector('[data-reset]').onclick = () => {
+      if (t.interval) { clearInterval(t.interval); t.interval = null; }
+      t.rem = TOMATO_WORK; t.total = TOMATO_WORK; t.mode = 'work';
+      timeEl.textContent = hms(t.rem);
+      arcEl.setAttribute('stroke-dashoffset', CIRC);
+      actionBtn.innerHTML = ui.icon('play', 14) + '开始';
+      modeLabel.textContent = '专注 25 分钟';
+    };
+
+    t.card = card;
+    return card;
+  }
+
   function render(view) {
     const s = store.state;
     const today = u.today();
@@ -100,6 +193,9 @@
     list.appendChild(addCd);
     cdCard.querySelector('[data-add]').onclick = () => w.examDialog(null, App.render);
     root.appendChild(cdCard);
+
+    /* 番茄钟 */
+    root.appendChild(buildTomatoCard());
 
     /* 今日数据 */
     const statCard = u.el(`<div class="card">

@@ -147,3 +147,34 @@
 .tpl-card .th .n{font-size:14.5px;font-weight:800;flex:1}
 .tpl-card li{font-size:13px;color:var(--ink-2);padding:3px 0 3px 14px;position:relative}
 .tpl-card li::before{content:"";position:absolute;left:2px;top:11px;width:5px;height:5px;border-radius:50%;background:var(--rose-soft)}
+
+/* ========== 深色模式页面覆盖 ========== */
+[data-dark="1"] .rv-item{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}
+[data-dark="1"] .sum{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.1)}
+[data-dark="1"] .tpl-card{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.1)}
+[data-dark="1"] .paper-card{background:var(--card)}
+[data-dark="1"] .entry{background:var(--card)}
+[data-dark="1"] .cal-cell{background:rgba(255,255,255,.06);color:#C8D8EE}
+[data-dark="1"] .cal-cell.blank{background:none}
+[data-dark="1"] .home-hero .hi{background:linear-gradient(120deg,#A0C8F8,#8BAADA 60%,#7EC8E8);-webkit-background-clip:text;background-clip:text;color:transparent}
+
+/* ========== 番茄钟 ========== */
+.tomato-card{border-radius:20px;padding:16px;background:linear-gradient(135deg,rgba(255,255,255,.9),rgba(235,243,255,.9));box-shadow:var(--shadow);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.8);margin-bottom:14px}
+.tomato-ring{position:relative;width:110px;height:110px;margin:0 auto 10px;flex:0 0 auto}
+.tomato-ring svg{transform:rotate(-90deg)}
+.tomato-ring .tr-bg{fill:none;stroke:rgba(74,143,232,.14);stroke-width:7}
+.tomato-ring .tr-fill{fill:none;stroke:var(--rose);stroke-width:7;stroke-linecap:round;transition:stroke-dashoffset .9s linear}
+.tomato-time{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:1px}
+.tomato-label{text-align:center;font-size:11px;font-weight:800;color:var(--ink-3);margin-top:2px;letter-spacing:.5px}
+.tomato-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px}
+[data-dark="1"] .tomato-card{background:linear-gradient(135deg,rgba(30,40,60,.9),rgba(18,28,50,.9))}
+
+/* ========== 模拟考计时器 ========== */
+.sim-overlay{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;animation:fade .2s ease}
+.sim-overlay.blue-bg{background:linear-gradient(160deg,#0F1626,#1A2A50,#0D1D40)}
+.sim-time-big{font-size:72px;font-weight:900;color:#fff;font-variant-numeric:tabular-nums;letter-spacing:2px;line-height:1;text-shadow:0 4px 20px rgba(74,143,232,.5)}
+.sim-label{font-size:16px;font-weight:800;color:rgba(255,255,255,.7);margin-top:8px;letter-spacing:1px}
+.sim-name{font-size:20px;font-weight:900;color:#fff;margin-bottom:28px;opacity:.9}
+.sim-progress{width:260px;height:6px;border-radius:3px;background:rgba(255,255,255,.2);margin:24px 0 28px;overflow:hidden}
+.sim-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--rose-soft),var(--rose));transition:width .9s linear}
+.sim-acts{display:flex;gap:12px}

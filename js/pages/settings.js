@@ -185,6 +185,21 @@
     </div>`);
   }
 
+  const ACCENTS = [
+    { key: 'blue', label: '深蓝科技', color: '#2563C8' },
+    { key: 'green', label: '墨绿专注', color: '#1E8C63' },
+    { key: 'orange', label: '暖橙活力', color: '#D4581A' },
+    { key: 'light', label: '浅色简约', color: '#3A5F8A' },
+  ];
+
+  function applyTheme(darkMode, accent) {
+    const el = document.documentElement;
+    if (darkMode) el.setAttribute('data-dark', '1');
+    else el.removeAttribute('data-dark');
+    if (accent && accent !== 'blue') el.setAttribute('data-accent', accent);
+    else el.removeAttribute('data-accent');
+  }
+
   async function render(view) {
     const s = store.state;
     const root = u.el(`<div>
@@ -192,6 +207,18 @@
         <div class="grow"><h1>设置</h1><div class="sub">数据备份 · 计划模板 · 考试管理</div></div></div>
 
       <div data-account></div>
+
+      <div class="card" data-appearance>
+        <div class="sec-head"><div class="sec-title"><i class="dot"></i>外观</div></div>
+        <div class="list-item" style="cursor:default">
+          <span class="ic" style="background:linear-gradient(135deg,#5B8FD4,#2563C8)">${ui.icon('moon', 17)}</span>
+          <span class="tt"><span class="a">深色模式</span><span class="b">夜间护眼，自动适配深色背景</span></span>
+          <input type="checkbox" data-darkmode ${s.settings.darkMode ? 'checked' : ''} style="width:20px;height:20px;accent-color:var(--rose)">
+        </div>
+        <div class="divider"></div>
+        <div class="small muted" style="margin-bottom:9px;font-weight:700">主题皮肤</div>
+        <div class="row wrap" data-accents style="gap:8px"></div>
+      </div>
 
       <div class="card">
         <div class="sec-head"><div class="sec-title"><i class="dot"></i>手机扫码打开</div></div>
@@ -260,6 +287,29 @@
     </div>`);
 
     root.querySelector('[data-back]').onclick = () => history.back();
+
+    // 外观：深色模式 + 主题皮肤
+    root.querySelector('[data-darkmode]').onchange = (e) => {
+      s.settings.darkMode = e.target.checked;
+      store.save();
+      applyTheme(s.settings.darkMode, s.settings.accent);
+    };
+    const accentBox = root.querySelector('[data-accents]');
+    ACCENTS.forEach((a) => {
+      const cur = s.settings.accent || 'blue';
+      const btn = u.el(`<button class="chip ${cur === a.key ? 'on' : ''}" style="display:flex;align-items:center;gap:6px">
+        <span style="width:12px;height:12px;border-radius:50%;background:${a.color};flex:0 0 auto"></span>${u.esc(a.label)}
+      </button>`);
+      btn.onclick = () => {
+        s.settings.accent = a.key;
+        store.save();
+        applyTheme(s.settings.darkMode, a.key);
+        accentBox.querySelectorAll('.chip').forEach((c) => c.classList.remove('on'));
+        btn.classList.add('on');
+      };
+      accentBox.appendChild(btn);
+    });
+
     root.querySelector('[data-exp-all]').onclick = () => exportData(true);
     root.querySelector('[data-exp-lite]').onclick = () => exportData(false);
     root.querySelector('[data-imp]').onclick = importData;
