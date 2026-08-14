@@ -13,16 +13,38 @@
     { hash: '#/papers', name: '试卷', icon: 'file' },
   ];
 
+  const isPC = () => window.innerWidth >= 768;
+
   function renderTabs(hash) {
     const bar = document.getElementById('tabbar');
     bar.innerHTML = '';
+
+    // PC 侧边栏：顶部 Logo 区
+    if (isPC()) {
+      const logo = u.el(`<div class="sidebar-logo">
+        <span class="sidebar-logo-icon">${ui.icon('home', 20)}</span>考公助手
+      </div>`);
+      bar.appendChild(logo);
+    }
+
     TABS.forEach((t) => {
       const on = hash === t.hash || (t.hash === '#/modules' && hash.startsWith('#/module/'));
       const el = u.el(`<button class="tab ${on ? 'on' : ''}"><span class="ic">${ui.icon(t.icon, 20)}</span>${t.name}</button>`);
       el.onclick = () => (location.hash = t.hash);
       bar.appendChild(el);
     });
-    bar.classList.toggle('hide', hash === '#/settings');
+
+    // PC 侧边栏底部：设置入口
+    if (isPC()) {
+      const spacer = u.el('<div style="flex:1"></div>');
+      bar.appendChild(spacer);
+      const settingsBtn = u.el(`<button class="tab ${hash === '#/settings' ? 'on' : ''}"><span class="ic">${ui.icon('gear', 20)}</span>设置</button>`);
+      settingsBtn.onclick = () => (location.hash = '#/settings');
+      bar.appendChild(settingsBtn);
+    }
+
+    // 移动端 settings 页隐藏底部 TabBar；PC 侧边栏始终显示（CSS media query 覆盖 hide）
+    bar.classList.toggle('hide', !isPC() && hash === '#/settings');
   }
 
   function render() {
@@ -57,6 +79,16 @@
     if (!location.hash) location.hash = '#/home';
     lastHash = location.hash;
     render();
+  });
+
+  // 窗口宽度跨越断点时重新渲染 TabBar（PC ↔ 手机切换）
+  let lastPC = isPC();
+  window.addEventListener('resize', () => {
+    const nowPC = isPC();
+    if (nowPC !== lastPC) {
+      lastPC = nowPC;
+      renderTabs(location.hash || '#/home');
+    }
   });
 
   App.render = render;

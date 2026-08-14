@@ -180,3 +180,26 @@
 .sim-progress{width:260px;height:6px;border-radius:3px;background:rgba(255,255,255,.2);margin:24px 0 28px;overflow:hidden}
 .sim-progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--rose-soft),var(--rose));transition:width .9s linear}
 .sim-acts{display:flex;gap:12px}
+
+/* ========== PC 宽屏页面级适配 (≥768px) ========== */
+@media (min-width:768px){
+  /* 首页两栏布局 */
+  .home-hero .hi{font-size:26px}
+
+  /* 板块网格 3 列 */
+  .mod-grid{grid-template-columns:repeat(3,1fr)}
+
+  /* 今日数据格子更大 */
+  .stat .v{font-size:22px}
+  .stat{padding:14px 10px}
+
+  /* 打卡日历统计 5 列 */
+  .sum-grid{grid-template-columns:repeat(5,1fr)}
+
+  /* 试卷分段输入行更宽 */
+  .sec-row{grid-template-columns:2fr 1fr 1fr 1fr 1fr auto}
+
+  /* 弹窗宽度适中 */
+  .sheet{max-width:560px;border-radius:26px;margin:auto;animation:pop .22s cubic-bezier(.22,1,.36,1)}
+  .mask{align-items:center}
+}
