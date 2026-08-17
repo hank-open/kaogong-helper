@@ -185,7 +185,7 @@
     hero.querySelector('[data-go-cal]').onclick = () => (location.hash = '#/checkin');
     root.appendChild(hero);
 
-    /* 倒计时 */
+    /* ── 倒计时卡片 ── */
     const cdCard = u.el(`<div class="card">
       <div class="sec-head"><div class="sec-title"><i class="dot"></i>考试倒计时</div>
         <button class="sec-more" data-add>${ui.icon('plus', 14)}添加</button></div>
@@ -199,12 +199,8 @@
     addCd.onclick = () => w.examDialog(null, App.render);
     list.appendChild(addCd);
     cdCard.querySelector('[data-add]').onclick = () => w.examDialog(null, App.render);
-    root.appendChild(cdCard);
 
-    /* 番茄钟 */
-    root.appendChild(buildTomatoCard());
-
-    /* 今日数据 */
+    /* ── 今日数据 ── */
     const statCard = u.el(`<div class="card">
       <div class="sec-head"><div class="sec-title"><i class="dot"></i>今日数据</div>
         <button class="sec-more" data-more>全部统计${ui.icon('right', 13)}</button></div>
@@ -219,9 +215,8 @@
     statCard.querySelector('[data-more]').onclick = () => (location.hash = '#/modules');
     statCard.querySelector('[data-ck]').onclick = () => w.checkinDialog(today, App.render);
     statCard.querySelector('[data-rec]').onclick = () => w.practiceDialog(null, App.render);
-    root.appendChild(statCard);
 
-    /* 今日计划 */
+    /* ── 今日计划 ── */
     const planCard = u.el(`<div class="card">
       <div class="sec-head"><div class="sec-title"><i class="dot"></i>今日计划</div>
         <button class="sec-more" data-tpl>${ui.icon('list', 14)}从模板导入</button></div>
@@ -242,7 +237,6 @@
         <button class="icon-btn plain" data-del>${ui.icon('trash', 16)}</button>
       </div>`);
       const toggle = () => {
-        // 保存输入框内容，重渲后恢复（避免用户输入中途被清空）
         const draftEl = document.querySelector('[data-new]');
         const draft = draftEl ? draftEl.value : '';
         store.togglePlan(p.id);
@@ -254,10 +248,7 @@
       };
       it.querySelector('.check').onclick = toggle;
       it.querySelector('.txt').onclick = toggle;
-      it.querySelector('[data-del]').onclick = () => {
-        store.delPlan(p.id);
-        App.render();
-      };
+      it.querySelector('[data-del]').onclick = () => { store.delPlan(p.id); App.render(); };
       planBox.appendChild(it);
     });
     const newInp = planCard.querySelector('[data-new]');
@@ -270,9 +261,8 @@
     planCard.querySelector('[data-addplan]').onclick = addPlan;
     newInp.onkeydown = (e) => e.key === 'Enter' && addPlan();
     planCard.querySelector('[data-tpl]').onclick = () => tplPicker(today);
-    root.appendChild(planCard);
 
-    /* 每日复盘（今日计划下方，最近错题上方） */
+    /* ── 每日复盘 ── */
     const rvCard = u.el(`<div class="card">
       <div class="sec-head"><div class="sec-title"><i class="dot"></i>每日复盘</div>
         <div class="row"><button class="sec-more" data-add>${ui.icon('plus', 14)}新增</button>
@@ -284,9 +274,8 @@
     reviews.slice(0, 2).forEach((r) => rvBox.appendChild(App.pages.review.card(r, App.render, true)));
     rvCard.querySelector('[data-add]').onclick = () => w.reviewDialog(null, App.render);
     rvCard.querySelector('[data-more]').onclick = () => (location.hash = '#/review');
-    root.appendChild(rvCard);
 
-    /* 最近错题 */
+    /* ── 最近错题 ── */
     const msCard = u.el(`<div class="card">
       <div class="sec-head"><div class="sec-title"><i class="dot"></i>最近错题</div>
         <div class="row"><button class="sec-more" data-add>${ui.icon('plus', 14)}新增</button>
@@ -298,9 +287,8 @@
     s.mistakes.slice(0, 3).forEach((m) => msBox.appendChild(App.pages.mistakes.card(m, App.render, true)));
     msCard.querySelector('[data-add]').onclick = () => w.mistakeDialog(null, App.render);
     msCard.querySelector('[data-more]').onclick = () => (location.hash = '#/mistakes');
-    root.appendChild(msCard);
 
-    /* 近 7 天学习时长 */
+    /* ── 近 7 天学习时长 ── */
     const days = u.lastDays(7);
     const chartCard = u.el(`<div class="card">
       <div class="sec-head"><div class="sec-title"><i class="dot"></i>近 7 天学习时长</div>
@@ -308,12 +296,44 @@
       <div data-chart></div>
     </div>`);
     chartCard.querySelector('[data-more]').onclick = () => (location.hash = '#/checkin');
-    root.appendChild(chartCard);
 
-    /* 悬浮按钮：扫码打开 */
+    /* ── 扫码浮层按钮（移动端）── */
     const fab = u.el(`<button class="fab-qr" title="扫码打开">${ui.icon('qr', 18)}</button>`);
     fab.onclick = () => openQrSheet();
-    root.appendChild(fab);
+
+    /* ── 番茄钟 ── */
+    const tomatoCard = buildTomatoCard();
+
+    /* ── 布局组装 ── */
+    if (window.innerWidth >= 768) {
+      // PC 双列：左列主操作，右列辅助
+      const grid = u.el('<div class="home-pc-grid"></div>');
+      const left = u.el('<div class="home-pc-left"></div>');
+      const right = u.el('<div class="home-pc-right"></div>');
+
+      left.appendChild(cdCard);
+      left.appendChild(statCard);
+      left.appendChild(planCard);
+      left.appendChild(rvCard);
+      left.appendChild(msCard);
+
+      right.appendChild(tomatoCard);
+      right.appendChild(chartCard);
+
+      grid.appendChild(left);
+      grid.appendChild(right);
+      root.appendChild(grid);
+    } else {
+      // 手机单列
+      root.appendChild(cdCard);
+      root.appendChild(tomatoCard);
+      root.appendChild(statCard);
+      root.appendChild(planCard);
+      root.appendChild(rvCard);
+      root.appendChild(msCard);
+      root.appendChild(chartCard);
+      root.appendChild(fab);
+    }
 
     view.innerHTML = '';
     view.appendChild(root);

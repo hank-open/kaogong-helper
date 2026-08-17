@@ -388,94 +388,128 @@ ul{margin:0;padding:0;list-style:none}
 
 /* ========== PC 宽屏适配 (≥768px) ========== */
 @media (min-width:768px){
-  /* 侧边栏 */
+  /* ── 侧边栏 ── */
   .tabbar{
     left:0;top:0;bottom:0;
     transform:none;
-    width:220px;height:100vh;
+    width:240px;height:100vh;
     max-width:none;
     border-radius:0;
     flex-direction:column;
     justify-content:flex-start;
     align-items:stretch;
-    padding:0 12px 28px;
+    padding:0 14px 28px;
     gap:2px;
-    background:rgba(255,255,255,.97);
-    backdrop-filter:blur(20px);
-    box-shadow:1px 0 0 rgba(37,99,200,.08),4px 0 18px rgba(30,70,160,.07);
+    background:rgba(255,255,255,.98);
+    backdrop-filter:blur(24px);
+    box-shadow:1px 0 0 rgba(37,99,200,.07),6px 0 24px rgba(30,70,160,.06);
     border:none;
-    border-right:1px solid rgba(37,99,200,.09);
+    border-right:1px solid rgba(37,99,200,.08);
   }
   /* 始终显示侧边栏（覆盖 settings 页的 hide） */
   #tabbar.hide{display:flex !important}
 
   /* Logo 由 JS 注入 .sidebar-logo */
   .sidebar-logo{
-    display:flex;align-items:center;gap:9px;
-    font-size:17px;font-weight:900;color:var(--rose-deep);
-    padding:28px 14px 20px;
-    letter-spacing:.5px;
+    display:flex;align-items:center;gap:10px;
+    font-size:16px;font-weight:900;color:var(--rose-deep);
+    padding:26px 6px 18px;
+    letter-spacing:.3px;
     flex:0 0 auto;
     border-bottom:1px solid var(--line);
-    margin-bottom:10px;
+    margin-bottom:8px;
   }
   .sidebar-logo-icon{
-    width:32px;height:32px;border-radius:10px;
+    width:34px;height:34px;border-radius:11px;
     background:linear-gradient(135deg,#5A9FF0,#2563C8);
     display:flex;align-items:center;justify-content:center;color:#fff;
     flex:0 0 auto;
+    box-shadow:0 6px 14px rgba(37,99,200,.28);
   }
+
+  /* ── Tab 导航项 ── */
   .tab{
     flex-direction:row;
     justify-content:flex-start;
     align-items:center;
     gap:10px;
-    padding:10px 14px;
-    border-radius:14px;
-    font-size:14px;
+    padding:10px 12px;
+    border-radius:13px;
+    font-size:13.5px;
     width:100%;
     text-align:left;
-    color:var(--ink-2);
+    color:var(--ink-3);
     font-weight:700;
+    transition:background .15s ease,color .15s ease,box-shadow .15s ease;
+    position:relative;
   }
-  .tab .ic{width:28px;height:28px;border-radius:10px;flex:0 0 auto;background:none}
-  .tab.on{background:var(--rose-tint);color:var(--rose-deep)}
-  .tab.on .ic{background:rgba(74,143,232,.18);transform:none}
+  .tab:hover{
+    background:rgba(37,99,200,.06);
+    color:var(--ink-2);
+  }
+  .tab .ic{
+    width:28px;height:28px;border-radius:10px;
+    flex:0 0 auto;background:none;
+    transition:background .15s ease,transform .15s ease;
+  }
+  .tab.on{
+    background:linear-gradient(105deg,rgba(74,143,232,.14),rgba(37,99,200,.06));
+    color:var(--rose-deep);
+    box-shadow:inset 3px 0 0 var(--rose-deep);
+  }
+  .tab.on .ic{
+    background:rgba(74,143,232,.16);
+    transform:none;
+  }
+  .tab:active{transform:scale(.97)}
 
-  /* 内容区偏移 */
-  #app{margin-left:220px;min-height:100vh}
+  /* ── 内容区 ── */
+  #app{margin-left:240px;min-height:100vh}
   .view{
-    max-width:760px;
-    padding:36px 36px 48px;
+    max-width:920px;
+    padding:36px 40px 52px;
     margin:0 auto;
   }
 
-  /* FAB */
-  .fab{right:28px;bottom:28px}
-  .fab-qr{right:28px;bottom:28px}
+  /* ── 卡片桌面悬停反馈 ── */
+  .view .card{
+    transition:transform .2s cubic-bezier(.16,1,.3,1),box-shadow .2s ease;
+  }
+  .view .card:hover{
+    transform:translateY(-2px);
+    box-shadow:var(--shadow-lg);
+  }
 
-  /* Toast 居中于内容区，离底部 40px */
-  #toast-root{left:220px;right:0;bottom:40px;pointer-events:none}
+  /* ── FAB ── */
+  .fab{right:32px;bottom:32px}
+  /* PC 上 QR 浮层收入 hero，隐藏角落悬浮按钮 */
+  .fab-qr{display:none}
 
-  /* 弹窗遮罩从侧边栏右侧开始 */
-  .mask{left:220px}
+  /* ── Toast / 遮罩 / 覆盖层 ── */
+  #toast-root{left:240px;right:0;bottom:40px;pointer-events:none}
+  .mask{left:240px}
+  .sim-overlay{left:240px}
 
-  /* 模拟考计时覆盖层 */
-  .sim-overlay{left:220px}
+  /* ── 背景光斑避开侧边栏 ── */
+  .b1{left:180px}
+  .b3{left:140px}
 
-  /* 背景光斑避开侧边栏 */
-  .b1{left:160px}
-  .b3{left:120px}
-
-  /* 深色模式侧边栏 */
+  /* ── 深色模式侧边栏 ── */
   [data-dark="1"] .tabbar{
-    background:rgba(14,22,44,.97);
-    border-right-color:rgba(255,255,255,.07);
+    background:rgba(10,16,36,.98);
+    border-right-color:rgba(255,255,255,.06);
+    box-shadow:1px 0 0 rgba(255,255,255,.04),6px 0 24px rgba(0,0,0,.25);
   }
   [data-dark="1"] .sidebar-logo{
-    border-bottom-color:rgba(255,255,255,.08);
+    border-bottom-color:rgba(255,255,255,.07);
     color:var(--rose-soft);
   }
-  [data-dark="1"] .tab{color:rgba(200,216,240,.7)}
-  [data-dark="1"] .tab.on{background:rgba(74,143,232,.14);color:var(--rose-soft)}
+  [data-dark="1"] .tab{color:rgba(180,200,230,.55)}
+  [data-dark="1"] .tab:hover{background:rgba(74,143,232,.09);color:rgba(200,220,245,.8)}
+  [data-dark="1"] .tab.on{
+    background:linear-gradient(105deg,rgba(74,143,232,.18),rgba(37,99,200,.07));
+    color:var(--rose-soft);
+    box-shadow:inset 3px 0 0 var(--rose-soft);
+  }
+  [data-dark="1"] .tab.on .ic{background:rgba(74,143,232,.22)}
 }
